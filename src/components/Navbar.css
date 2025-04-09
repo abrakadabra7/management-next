@@ -1,0 +1,111 @@
+.navbar {
+  background-color: #222831;
+  padding: 16px 0;
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+}
+
+.logo-icon {
+  margin-right: 10px;
+  font-size: 24px;
+}
+
+.nav-links {
+  display: flex;
+}
+
+.nav-link {
+  color: #eeeeee;
+  cursor: pointer;
+  margin: 0 20px;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 0;
+  position: relative;
+  transition: all 0.3s;
+}
+
+.nav-link:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #00adb5;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #00adb5;
+}
+
+.nav-link:hover:after {
+  width: 100%;
+}
+
+.nav-link.active {
+  color: #00adb5;
+}
+
+.nav-link.active:after {
+  width: 100%;
+  background-color: #00adb5;
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+}
+
+.lang-button {
+  background-color: #00adb5;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  margin-right: 16px;
+  transition: all 0.3s;
+  font-weight: bold;
+}
+
+.lang-button:hover {
+  background-color: #00868e;
+  transform: translateY(-2px);
+}
+
+.settings-button {
+  background: none;
+  border: none;
+  color: #eeeeee;
+  font-size: 22px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.settings-button:hover {
+  color: #00adb5;
+  transform: rotate(30deg);
+} 
