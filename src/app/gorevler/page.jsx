@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
+import TaskModal from '../../components/TaskModal';
 import './tasks.css';
 
 export default function Gorevler() {
   // Örnek görev verileri - ileride Supabase'den gelecek
-  const tasks = [
+  const [tasks, setTasks] = useState([
     {
       id: 1,
       title: 'Ana Sayfa Tasarımı',
@@ -56,12 +57,15 @@ export default function Gorevler() {
       dueDate: '2025-04-05',
       assignee: 'Ali Kara'
     }
-  ];
+  ]);
   
   const [filterProject, setFilterProject] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterPriority, setFilterPriority] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [modalMode, setModalMode] = useState('add');
   
   // Filtreleme işlevi
   const filteredTasks = tasks.filter(task => {
@@ -90,11 +94,50 @@ export default function Gorevler() {
     if (status === 'completed') return 'Tamamlandı';
   };
 
+  const openAddModal = () => {
+    setModalMode('add');
+    setSelectedTask(null);
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (task) => {
+    setModalMode('edit');
+    setSelectedTask(task);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = (formData) => {
+    setIsModalOpen(false);
+    
+    if (!formData) return; // Eğer form verileri yoksa (iptal edildi), işlem yapma
+    
+    if (modalMode === 'add') {
+      // Yeni görev ekleme
+      const newTask = {
+        id: Math.max(0, ...tasks.map(t => t.id)) + 1, // Yeni ID oluşturma
+        ...formData
+      };
+      setTasks([...tasks, newTask]);
+    } else {
+      // Mevcut görevi güncelleme
+      const updatedTasks = tasks.map(task => 
+        task.id === selectedTask.id ? { ...task, ...formData } : task
+      );
+      setTasks(updatedTasks);
+    }
+  };
+
+  const handleDeleteTask = (taskId) => {
+    if (window.confirm('Bu görevi silmek istediğinize emin misiniz?')) {
+      setTasks(tasks.filter(task => task.id !== taskId));
+    }
+  };
+
   return (
     <div className="tasks-page">
       <div className="header">
         <h1 className="title">Görevler</h1>
-        <button className="add-button">
+        <button className="add-button" onClick={openAddModal}>
           <span className="add-icon">+</span>
           Yeni Görev
         </button>
@@ -188,12 +231,36 @@ export default function Gorevler() {
               <div className={`task-status status-${task.status}`}>
                 {getStatusText(task.status)}
               </div>
-              <button className="action-btn edit">✏️</button>
-              <button className="action-btn delete">🗑️</button>
+              <button 
+                className="action-btn edit"
+                onClick={() => openEditModal(task)}
+              >
+                ✏️
+              </button>
+              <button 
+                className="action-btn delete"
+                onClick={() => handleDeleteTask(task.id)}
+              >
+                🗑️
+              </button>
             </div>
           </div>
         ))}
+        
+        {filteredTasks.length === 0 && (
+          <div className="no-tasks">
+            <p>Bu kriterlere uyan görev bulunamadı.</p>
+          </div>
+        )}
       </div>
+
+      <TaskModal 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        task={selectedTask}
+        projects={projectOptions}
+        mode={modalMode}
+      />
     </div>
   );
 } 
