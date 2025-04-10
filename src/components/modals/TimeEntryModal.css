@@ -13,7 +13,7 @@
 }
 
 .modal {
-  background-color: white;
+  background-color: #222831;
   border-radius: 12px;
   width: 600px;
   max-width: 90%;
@@ -42,12 +42,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 2px solid #00adb5;
 }
 
 .modal-title {
   font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.3px;
+  color: white;
 }
 
 .close-button {
@@ -58,6 +60,7 @@
   cursor: pointer;
   transition: all 0.2s;
   margin-right: -5px;
+  line-height: 1;
 }
 
 .close-button:hover {
@@ -67,6 +70,8 @@
 
 .modal-body {
   padding: 25px;
+  background-color: #222831;
+  color: #eeeeee;
 }
 
 .form-group {
@@ -87,19 +92,20 @@
 .form-label {
   display: block;
   margin-bottom: 10px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 500;
+  color: #eeeeee;
   font-size: 16px;
 }
 
 .form-input, .form-textarea, .form-select {
   width: 100%;
   padding: 14px;
-  border: 1px solid #ddd;
+  border: 1px solid #393e46;
   border-radius: 8px;
   font-size: 16px;
   transition: border-color 0.3s;
-  color: #333;
+  color: #eeeeee;
+  background-color: #333;
 }
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
@@ -117,7 +123,7 @@
 .form-select {
   cursor: pointer;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23eee' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 12px center;
   background-size: 16px;
@@ -144,16 +150,17 @@
   margin-left: 10px;
   font-size: 15px;
   font-weight: 500;
-  color: #4b5563;
+  color: #eeeeee;
   min-width: 60px;
 }
 
 .modal-footer {
   padding: 20px 25px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #393e46;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  background-color: #222831;
 }
 
 .btn {
@@ -167,12 +174,12 @@
 }
 
 .btn-cancel {
-  background-color: #f3f4f6;
-  color: #333;
+  background-color: #393e46;
+  color: #eeeeee;
 }
 
 .btn-cancel:hover {
-  background-color: #e5e7eb;
+  background-color: #4a4f57;
 }
 
 .btn-save {
