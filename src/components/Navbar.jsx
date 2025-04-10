@@ -17,9 +17,26 @@ const Navbar = () => {
         </div>
         
         <div className="nav-links">
-          <NavLink href="/" label="Projeler" active={pathname === '/'} />
-          <NavLink href="/gorevler" label="Görevler" active={pathname === '/gorevler'} />
-          <NavLink href="/zaman-takibi" label="Zaman Takibi" active={pathname === '/zaman-takibi'} />
+          <NavLink 
+            href="/dashboard" 
+            label="Dashboard" 
+            active={pathname === '/dashboard'} 
+          />
+          <NavLink 
+            href="/" 
+            label="Projeler" 
+            active={pathname === '/'} 
+          />
+          <NavLink 
+            href="/gorevler" 
+            label="Görevler" 
+            active={pathname === '/gorevler'} 
+          />
+          <NavLink 
+            href="/zaman-takibi" 
+            label="Zaman Takibi" 
+            active={pathname === '/zaman-takibi'} 
+          />
         </div>
         
         <div className="buttons">

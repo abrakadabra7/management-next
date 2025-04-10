@@ -20,10 +20,10 @@ const TaskModal = ({ isOpen, onClose, task, projects, mode }) => {
       setFormData({
         title: task.title || '',
         description: task.description || '',
-        project: task.project || '',
+        project: task.project_id || '',
         status: task.status || 'todo',
         priority: task.priority || 'medium',
-        dueDate: task.dueDate || '',
+        dueDate: task.due_date || '',
         assignee: task.assignee || ''
       });
     } else {
@@ -31,7 +31,7 @@ const TaskModal = ({ isOpen, onClose, task, projects, mode }) => {
       setFormData({
         title: '',
         description: '',
-        project: projects && projects.length > 0 ? projects[0] : '',
+        project: projects && projects.length > 0 ? projects[0].id : '',
         status: 'todo',
         priority: 'medium',
         dueDate: '',
@@ -109,8 +109,8 @@ const TaskModal = ({ isOpen, onClose, task, projects, mode }) => {
                 onChange={handleChange}
                 required
               >
-                {projects && projects.map((project, index) => (
-                  <option key={index} value={project}>{project}</option>
+                {projects && projects.map((project) => (
+                  <option key={project.id} value={project.id}>{project.title}</option>
                 ))}
               </select>
             </div>

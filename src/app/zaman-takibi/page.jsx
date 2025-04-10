@@ -1,67 +1,21 @@
 "use client";
 
 import React, { useState } from 'react';
-import TimeEntryModal from '../../components/TimeEntryModal';
+import TimeHeader from './components/TimeHeader';
+import TimeSummary from './components/TimeSummary';
+import TimeFilters from './components/TimeFilters';
+import TimeEntryList from './components/TimeEntryList';
+import TimeTracker from './components/TimeTracker';
+import TimeEntryModal from '../../components/modals/TimeEntryModal';
+import useTimeEntries from '../../hooks/useTimeEntries';
+import useProjects from '../../hooks/useProjects';
+import useTasks from '../../hooks/useTasks';
 import './timetracking.css';
 
 export default function ZamanTakibi() {
-  // Örnek görev verileri - sadece modal için
-  const tasks = [
-    { id: 1, title: 'Ana Sayfa Tasarımı', project: 'Web Sitesi Tasarımı' },
-    { id: 2, title: 'Veri Modelinin Oluşturulması', project: 'Veritabanı Migrasyonu' },
-    { id: 3, title: 'API Endpoint Tasarımı', project: 'Mobil Uygulama Geliştirme' },
-    { id: 4, title: 'Kullanıcı Arayüzü İyileştirmeleri', project: 'Web Sitesi Tasarımı' },
-    { id: 5, title: 'Anahtar Kelime Analizi', project: 'SEO Optimizasyonu' }
-  ];
-
-  // Örnek zaman kaydı verileri - ileride Supabase'den gelecek
-  const [timeEntries, setTimeEntries] = useState([
-    {
-      id: 1,
-      task: 'Ana Sayfa Tasarımı',
-      project: 'Web Sitesi Tasarımı',
-      description: 'Ana sayfa taslağının hazırlanması ve komponent oluşturma',
-      duration: 180, // dakika cinsinden
-      date: '2025-04-10',
-      user: 'Ahmet Yılmaz'
-    },
-    {
-      id: 2,
-      task: 'Veritabanı Şeması',
-      project: 'Veritabanı Migrasyonu',
-      description: 'Yeni veritabanı yapısının tasarlanması',
-      duration: 120,
-      date: '2025-04-12',
-      user: 'Mehmet Demir'
-    },
-    {
-      id: 3,
-      task: 'API Endpoint Geliştirme',
-      project: 'Mobil Uygulama Geliştirme',
-      description: 'Kullanıcı yönetimi için API endpointlerinin oluşturulması',
-      duration: 240,
-      date: '2025-04-15',
-      user: 'Zeynep Kaya'
-    },
-    {
-      id: 4,
-      task: 'Form Validasyonu',
-      project: 'Web Sitesi Tasarımı',
-      description: 'İletişim formlarının validasyon kurallarının geliştirilmesi',
-      duration: 90,
-      date: '2025-04-14',
-      user: 'Ayşe Yıldız'
-    },
-    {
-      id: 5,
-      task: 'İçerik Analizi',
-      project: 'SEO Optimizasyonu',
-      description: 'Mevcut içeriklerin SEO açısından analiz edilmesi',
-      duration: 150,
-      date: '2025-04-11',
-      user: 'Ali Kara'
-    }
-  ]);
+  const { timeEntries, loading, error, addTimeEntry, editTimeEntry, removeTimeEntry } = useTimeEntries();
+  const { projects } = useProjects();
+  const { tasks } = useTasks();
   
   const [filterProject, setFilterProject] = useState('');
   const [filterUser, setFilterUser] = useState('');
@@ -74,16 +28,15 @@ export default function ZamanTakibi() {
   // Filtreleme işlevi
   const filteredEntries = timeEntries.filter(entry => {
     return (
-      (filterProject === '' || entry.project === filterProject) &&
-      (filterUser === '' || entry.user === filterUser) &&
-      (filterDateFrom === '' || new Date(entry.date) >= new Date(filterDateFrom)) &&
-      (filterDateTo === '' || new Date(entry.date) <= new Date(filterDateTo))
+      (filterProject === '' || entry.project_id === filterProject) &&
+      (filterUser === '' || entry.user_name === filterUser) &&
+      (filterDateFrom === '' || new Date(entry.entry_date) >= new Date(filterDateFrom)) &&
+      (filterDateTo === '' || new Date(entry.entry_date) <= new Date(filterDateTo))
     );
   });
   
   // Unique proje ve kullanıcı listeleri
-  const projectOptions = [...new Set(timeEntries.map(entry => entry.project))];
-  const userOptions = [...new Set(timeEntries.map(entry => entry.user))];
+  const userOptions = [...new Set(timeEntries.map(entry => entry.user_name))];
   
   // Süreyi biçimlendirme (180 dakika -> 3s 0d)
   const formatDuration = (minutes) => {
@@ -97,19 +50,19 @@ export default function ZamanTakibi() {
   
   // Proje bazında süreleri hesaplama
   const projectTotals = filteredEntries.reduce((totals, entry) => {
-    if (!totals[entry.project]) {
-      totals[entry.project] = 0;
+    if (!totals[entry.project_id]) {
+      totals[entry.project_id] = 0;
     }
-    totals[entry.project] += entry.duration;
+    totals[entry.project_id] += entry.duration;
     return totals;
   }, {});
   
   // Kullanıcı bazında süreleri hesaplama
   const userTotals = filteredEntries.reduce((totals, entry) => {
-    if (!totals[entry.user]) {
-      totals[entry.user] = 0;
+    if (!totals[entry.user_name]) {
+      totals[entry.user_name] = 0;
     }
-    totals[entry.user] += entry.duration;
+    totals[entry.user_name] += entry.duration;
     return totals;
   }, {});
 
@@ -125,182 +78,123 @@ export default function ZamanTakibi() {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = (formData) => {
+  const handleCloseModal = async (formData) => {
     setIsModalOpen(false);
     
     if (!formData) return; // Eğer form verileri yoksa (iptal edildi), işlem yapma
     
-    if (modalMode === 'add') {
-      // Yeni zaman kaydı ekleme
-      const newTimeEntry = {
-        id: Math.max(0, ...timeEntries.map(t => t.id)) + 1, // Yeni ID oluşturma
-        ...formData
-      };
-      setTimeEntries([...timeEntries, newTimeEntry]);
-    } else {
-      // Mevcut zaman kaydını güncelleme
-      const updatedTimeEntries = timeEntries.map(timeEntry => 
-        timeEntry.id === selectedTimeEntry.id ? { ...timeEntry, ...formData } : timeEntry
-      );
-      setTimeEntries(updatedTimeEntries);
+    try {
+      if (modalMode === 'add') {
+        // Yeni zaman kaydı ekleme
+        await addTimeEntry({
+          task_id: formData.task_id,
+          project_id: formData.project_id,
+          description: formData.description,
+          duration: formData.duration,
+          entry_date: formData.entry_date,
+          user_name: formData.user_name,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      } else if (modalMode === 'edit' && selectedTimeEntry) {
+        // Mevcut zaman kaydını güncelleme
+        await editTimeEntry(selectedTimeEntry.id, {
+          task_id: formData.task_id,
+          project_id: formData.project_id,
+          description: formData.description,
+          duration: formData.duration,
+          entry_date: formData.entry_date,
+          user_name: formData.user_name
+        });
+      }
+    } catch (err) {
+      console.error('İşlem sırasında hata oluştu:', err);
     }
   };
 
-  const handleDeleteTimeEntry = (timeEntryId) => {
+  const handleDeleteTimeEntry = async (timeEntryId) => {
     if (window.confirm('Bu zaman kaydını silmek istediğinize emin misiniz?')) {
-      setTimeEntries(timeEntries.filter(entry => entry.id !== timeEntryId));
+      try {
+        await removeTimeEntry(timeEntryId);
+      } catch (err) {
+        console.error('Zaman kaydı silinirken hata oluştu:', err);
+      }
     }
   };
+
+  // Proje adını ID'ye göre bul
+  const getProjectName = (projectId) => {
+    if (!projectId) return 'Belirtilmemiş';
+    const project = projects.find(p => p.id === projectId);
+    return project ? project.title : 'Bilinmeyen Proje';
+  };
+
+  // Görev adını ID'ye göre bul
+  const getTaskName = (taskId) => {
+    if (!taskId) return 'Belirtilmemiş';
+    const task = tasks.find(t => t.id === taskId);
+    return task ? task.title : 'Bilinmeyen Görev';
+  };
+
+  const handleSaveTimeEntry = (timeEntryData) => {
+    addTimeEntry(timeEntryData);
+  };
+
+  if (loading && timeEntries.length === 0) {
+    return <div className="loading">Zaman kayıtları yükleniyor...</div>;
+  }
+
+  if (error && timeEntries.length === 0) {
+    return <div className="error">{error}</div>;
+  }
 
   return (
     <div className="timetracking-page">
-      <div className="header">
-        <h1 className="title">Zaman Takibi</h1>
-        <button className="add-button" onClick={openAddModal}>
-          <span className="add-icon">+</span>
-          Yeni Zaman Kaydı
-        </button>
-      </div>
-
-      {/* Özet Bölümü */}
-      <div className="summary-section">
-        <h2 className="summary-title">Özet Bilgiler</h2>
-        <div className="summary-cards">
-          <div className="summary-card">
-            <div className="summary-value">{formatDuration(totalDuration)}</div>
-            <div className="summary-label">Toplam Süre</div>
-          </div>
-          
-          <div className="summary-card">
-            <div className="summary-value">{filteredEntries.length}</div>
-            <div className="summary-label">Toplam Kayıt</div>
-          </div>
-          
-          <div className="summary-card">
-            <div className="summary-value">{projectOptions.length}</div>
-            <div className="summary-label">Proje Sayısı</div>
-          </div>
-          
-          <div className="summary-card">
-            <div className="summary-value">{userOptions.length}</div>
-            <div className="summary-label">Çalışan Sayısı</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filtreler */}
-      <div className="filters">
-        <div className="filters-row">
-          <div className="filter-group">
-            <label className="filter-label">Proje</label>
-            <select 
-              className="filter-select" 
-              value={filterProject}
-              onChange={(e) => setFilterProject(e.target.value)}
-            >
-              <option value="">Tüm Projeler</option>
-              {projectOptions.map(project => (
-                <option key={project} value={project}>{project}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="filter-group">
-            <label className="filter-label">Çalışan</label>
-            <select 
-              className="filter-select"
-              value={filterUser}
-              onChange={(e) => setFilterUser(e.target.value)}
-            >
-              <option value="">Tüm Çalışanlar</option>
-              {userOptions.map(user => (
-                <option key={user} value={user}>{user}</option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="filter-group">
-            <label className="filter-label">Başlangıç Tarihi</label>
-            <input
-              type="date"
-              className="filter-input"
-              value={filterDateFrom}
-              onChange={(e) => setFilterDateFrom(e.target.value)}
-            />
-          </div>
-          
-          <div className="filter-group">
-            <label className="filter-label">Bitiş Tarihi</label>
-            <input
-              type="date"
-              className="filter-input"
-              value={filterDateTo}
-              onChange={(e) => setFilterDateTo(e.target.value)}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Zaman Kayıtları Listesi */}
-      {filteredEntries.length > 0 ? (
-        <div className="timetracking-list">
-          {filteredEntries.map(entry => (
-            <div key={entry.id} className="timetracking-card">
-              <div className="timeentry-info">
-                <div className="timeentry-header">
-                  <h3 className="timeentry-task">{entry.task}</h3>
-                  <span className="project-tag">{entry.project}</span>
-                </div>
-                
-                <p className="timeentry-description">{entry.description}</p>
-                
-                <div className="timeentry-meta">
-                  <div className="meta-item">
-                    <span className="meta-icon">👤</span>
-                    {entry.user}
-                  </div>
-                  <div className="meta-item">
-                    <span className="meta-icon">📅</span>
-                    {new Date(entry.date).toLocaleDateString('tr-TR')}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="timeentry-duration">
-                <span className="duration-icon">⏱️</span>
-                {formatDuration(entry.duration)}
-              </div>
-              
-              <div className="timeentry-actions">
-                <button 
-                  className="action-btn edit"
-                  onClick={() => openEditModal(entry)}
-                >
-                  ✏️
-                </button>
-                <button 
-                  className="action-btn delete"
-                  onClick={() => handleDeleteTimeEntry(entry.id)}
-                >
-                  🗑️
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="no-entries">
-          <div className="no-entries-icon">⏱️</div>
-          <p>Kriterlere uygun zaman kaydı bulunamadı</p>
-        </div>
-      )}
+      <TimeHeader onAddTimeEntry={openAddModal} />
+      
+      <TimeTracker 
+        onSaveTimeEntry={handleSaveTimeEntry}
+        projects={projects}
+        tasks={tasks}
+      />
+      
+      <TimeSummary 
+        totalDuration={totalDuration}
+        entryCount={filteredEntries.length}
+        projectCount={projects.length}
+        userCount={userOptions.length}
+        formatDuration={formatDuration}
+      />
+      
+      <TimeFilters 
+        projects={projects}
+        userOptions={userOptions}
+        filterProject={filterProject}
+        setFilterProject={setFilterProject}
+        filterUser={filterUser}
+        setFilterUser={setFilterUser}
+        filterDateFrom={filterDateFrom}
+        setFilterDateFrom={setFilterDateFrom}
+        filterDateTo={filterDateTo}
+        setFilterDateTo={setFilterDateTo}
+      />
+      
+      <TimeEntryList 
+        timeEntries={timeEntries}
+        filteredEntries={filteredEntries}
+        getProjectName={getProjectName}
+        getTaskName={getTaskName}
+        formatDuration={formatDuration}
+        onEditTimeEntry={openEditModal}
+        onDeleteTimeEntry={handleDeleteTimeEntry}
+      />
 
       <TimeEntryModal 
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
+        isOpen={isModalOpen} 
+        onClose={handleCloseModal} 
         timeEntry={selectedTimeEntry}
-        projects={projectOptions}
-        tasks={tasks}
+        projects={projects.map(p => ({ id: p.id, title: p.title }))}
+        tasks={tasks.map(t => ({ id: t.id, title: t.title, project_id: t.project_id }))}
         mode={modalMode}
       />
     </div>
