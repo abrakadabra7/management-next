@@ -1,3 +1,35 @@
+# Management
+## 🌟 Özellikler
+- **Dashboard**: 
+  - Proje ve görev istatistiklerini görüntüleme
+  - Haftalık çalışma süresi grafiği
+  - Yaklaşan görevler listesi
+  - En aktif projeler
+
+- **Proje Yönetimi**: 
+  - Proje oluşturma ve düzenleme
+  - Proje detayları görüntüleme
+  - Proje silme
+  - Proje bazlı görev filtreleme
+
+- **Görev Yönetimi**: 
+  - Görev oluşturma ve düzenleme
+  - Görev durumu takibi
+  - Görev atama
+  - Görev filtreleme ve arama
+
+- **Zaman Takibi**: 
+  - Manuel zaman girişi
+  - Gerçek zamanlı kronometre
+  - Proje bazlı zaman raporları
+  - Kullanıcı bazlı zaman analizi
+
+<br>
+
+## Youtube Videosu İçin Görsele Tıklayabilirsiniz 
+[<img src="https://github.com/abrakadabra7/management-next/blob/Managemet-NextJs/%D0%A1%D0%BD%D0%B8%D0%BC%D0%BE%D0%BA%20%D1%8D%D0%BA%D1%80%D0%B0%D0%BD%D0%B0%202025-04-11%20135229.png" width="50%">](https://youtu.be/kvgWb-U-y0E "Project management With NextJs")
+<br><br>
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
